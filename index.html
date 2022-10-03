@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>孤山云音乐</title>
+
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        div{
+            user-select: none;
+        }
+        .wrap{
+            margin-top: 10vh;
+            width: 80vw;
+            height: 70vh;
+            
+            border: 1px solid grey;
+            border-radius: 10px;
+            overflow: hidden;
+            /* display: flex;
+            flex-direction: column;
+            justify-content: flex-start; */
+        }
+        .top{
+            width: 100%;
+            height: 15%;
+            background-color: rgb(69, 151, 227);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo{
+            color: white;
+            font-size: 3vw;
+            margin-left: 1vw;
+        }
+        .search_bar{
+            background-color: skyblue;
+            border-radius: 3vw;
+
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+
+            overflow: hidden;
+            width: 40%;
+            height: 45%;
+            margin-right: 2%;
+            
+        }
+        .search_bar input{
+            border: none;
+            background-color: skyblue;
+            width: 75%;
+            margin-left: 5%;
+            height: 100%;
+            color: white;
+        }
+        .search_bar button{
+            border: none;
+            background-color: rgb(85, 167, 218);
+            width: 20%;
+            height: 100%;
+        }
+        .search_bar button:hover{
+            background-color: rgb(85, 132, 218);
+        }
+        .mid{
+            width: 100%;
+            height: 70%;
+            background-color: antiquewhite;
+
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .songs{
+            width: 30%;
+            height: 100%;
+            border-right: 1px solid gray;
+            background-color: cadetblue;
+            overflow: auto;
+        }
+        .songs li{
+            list-style-type: none;
+
+            display: flex;
+            justify-content: space-between;
+        }
+        .songs li{
+            background-color: white;
+        }
+        .songs li:nth-child(even){
+           background-color: whitesmoke;
+        }
+        .songs a{
+            color: gray;
+            text-decoration: none;
+        }
+        .songs a:hover{
+            color: skyblue;
+        }
+        .cd{
+            width: 39%;
+            height: 100%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cd img{
+            width: 70%;
+        }
+
+        .commentDiv{
+            width: 30%;
+            height: 100%;
+            border-left: 1px solid gray;
+            background-color: rgb(250, 250, 250);
+        }
+        .comments{
+            overflow: auto;
+            width: 100%;
+            height: 100%;
+        }
+        .comments dl{
+            list-style-type: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            border-bottom: 1px solid rgb(185, 185, 185);
+            margin-bottom: 1vh;
+        }
+        .comments dl img{
+            width: 15%;
+            border-radius: 50%;
+        }
+        .comments dl p:nth-of-type(1){
+           font-size: 1.5vw;
+           margin-left: 1vw;
+        }
+        .comments dl p:nth-of-type(2){
+           font-size: 1vw;
+           color: rgb(97, 97, 97);
+        }
+
+        .bottom{
+            height: 15%;
+            width: 100%;
+            background-color: whitesmoke;
+        }
+        .bottom audio{
+            width: 100%;
+            height: 100%;
+        }
+
+        .mv{
+            /* display: none; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(1,1, 1, 0.7);
+
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            
+            width: 100vw;
+            height: 100vh;
+        }
+        .mv video{
+            width: 70vw;
+            height: 50vw;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="wrap" id="player">
+        <div class="top"> 
+                <div class="logo">孤山云音乐</div>
+                <div class="search_bar">
+                    <input type="text" @keyup.enter="searchMusic" v-model="query" >
+                    <button @click="searchMusic">搜索</button>
+                </div>
+            
+        </div>
+        <div class="mid">
+            <div class="songs">
+                <ul>
+                    <li v-for="(item,index) in musicList" v-bind="musicList">
+                        <a href="javascript:;" @click="playmusic(item.id)"><b>{{item.name}}</b></a>
+                        <button v-if="item.mvid!=0" @click="playmv(item.mvid)">视</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="cd">
+                <img :src="musicimg" alt="">
+
+            </div>
+            <div class="commentDiv">
+                <div class="comments" >
+                    <dl v-for="item in hotComments">
+                        <img :src="item.user.avatarUrl">
+                        <div>
+                            <p class="username">{{item.user.nickname}}</p>
+                            <p class="commentText">{{item.content}}</p>
+                        </div>
+                        
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="bottom">
+            <audio :src="playUrl" controls></audio>
+        </div>
+
+        <div class="mv" v-show="mvShow" @click="hide">
+            <video :src="mvUrl" controls></video>
+        </div>
+    </div>
+    
+
+
+</body>
+<script src="js/vue2.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="anli1.js"></script>
+</html>
